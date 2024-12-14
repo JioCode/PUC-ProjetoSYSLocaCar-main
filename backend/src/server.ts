@@ -1,18 +1,29 @@
-const cors = require('cors');
-const express = require('express');
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import apiRoutes from './routes/api';
+
 const app = express();
 
-// Configure o CORS para permitir o acesso da origem do frontend
-app.use(cors({
-    origin: 'http://localhost:3001', // URL do frontend
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
-    credentials: true, // Caso precise enviar cookies ou autenticação
-}));
+// Configuração do CORS
+app.use(
+    cors({
+        origin: 'http://localhost:3001', // URL do frontend
+        methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+        credentials: true, // Caso precise enviar cookies ou autenticação
+    })
+);
 
-// Restante da configuração do servidor
-app.use(express.json());
-app.use('/api', require('./routes/api'));
+// Configuração do servidor
+app.use(express.json()); // Permite o uso de JSON no corpo das requisições
+app.use('/api', apiRoutes); // Rota base para as APIs
 
-app.listen(3000, () => {
-    console.log('Servidor rodando na porta 3000');
+// Rota padrão para checar status do servidor
+app.get('/', (req: Request, res: Response) => {
+    res.send('Servidor rodando com sucesso!');
+});
+
+// Inicia o servidor na porta 4000
+const PORT = 4000;
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
 });

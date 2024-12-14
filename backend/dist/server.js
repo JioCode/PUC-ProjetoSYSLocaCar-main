@@ -5,13 +5,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-const contratoRoutes_1 = __importDefault(require("./routes/contratoRoutes"));
-const routes_1 = __importDefault(require("./routes/routes")); // Importe suas rotas de cliente aqui
+const api_1 = __importDefault(require("./routes/api"));
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)());
-app.use(express_1.default.json());
-// Use a rota para contrato e cliente
-app.use("/api", contratoRoutes_1.default);
-app.use("/cliente", routes_1.default); // Rota para o cliente
+// Configuração do CORS
+app.use((0, cors_1.default)({
+    origin: 'http://localhost:3001', // URL do frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+    credentials: true, // Caso precise enviar cookies ou autenticação
+}));
+// Configuração do servidor
+app.use(express_1.default.json()); // Permite o uso de JSON no corpo das requisições
+app.use('/api', api_1.default); // Rota base para as APIs
+// Rota padrão para checar status do servidor
+app.get('/', (req, res) => {
+    res.send('Servidor rodando com sucesso!');
+});
+// Inicia o servidor na porta 4000
 const PORT = 4000;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+});
