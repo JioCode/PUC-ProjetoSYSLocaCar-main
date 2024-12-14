@@ -86,6 +86,8 @@ app.delete('/api/contratos/:id', async (req: Request, res: Response) => {
     }
 });
 
+
+
 // Rota padrão para checar status do servidor
 app.get('/', (req: Request, res: Response) => {
     res.send('Servidor rodando com sucesso!');
