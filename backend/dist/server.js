@@ -9,7 +9,7 @@ const api_1 = __importDefault(require("./routes/api"));
 const app = (0, express_1.default)();
 // Configuração do CORS
 app.use((0, cors_1.default)({
-    origin: 'http://localhost:3001', // URL do frontend
+    origin: 'http://localhost:3000', // URL do frontend
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
     credentials: true, // Caso precise enviar cookies ou autenticação
 }));
