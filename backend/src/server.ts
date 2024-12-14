@@ -1,15 +1,18 @@
-import express from "express";
-import cors from "cors";
-import contratoRoutes from "./routes/contratoRoutes";
-import clienteRoutes from "./routes/routes"; // Importe suas rotas de cliente aqui
-
+const cors = require('cors');
+const express = require('express');
 const app = express();
-app.use(cors());
+
+// Configure o CORS para permitir o acesso da origem do frontend
+app.use(cors({
+    origin: 'http://localhost:3001', // URL do frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+    credentials: true, // Caso precise enviar cookies ou autenticação
+}));
+
+// Restante da configuração do servidor
 app.use(express.json());
+app.use('/api', require('./routes/api'));
 
-// Use a rota para contrato e cliente
-app.use("/api", contratoRoutes);
-app.use("/cliente", clienteRoutes);  // Rota para o cliente
-
-const PORT = 4000;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+app.listen(3000, () => {
+    console.log('Servidor rodando na porta 3000');
+});
