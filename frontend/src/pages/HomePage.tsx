@@ -6,6 +6,7 @@ const HomePage: React.FC = () => {
         <div>
         <h1>Bem-vindo à Página Inicial</h1>
         <p>Vá para a <Link to="/contratos">Página de Contratos</Link></p>
+        <p>Vá para a <Link to="/locatarios">Página de Locatarios</Link></p>
         </div>
     );
 };
