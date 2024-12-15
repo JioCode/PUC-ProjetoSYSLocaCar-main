@@ -44,13 +44,15 @@ router.get('/contratos', async (req: Request, res: Response) => {
 router.delete('/contratos/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-      await prisma.contratoLocacao.delete({
-          where: { id: Number(id) }, // Certifique-se de converter o ID para número
+      const contratoExcluido = await prisma.contratoLocacao.delete({
+          where: {
+              id: Number(id),  // Certifique-se de que está convertendo o ID para número
+          },
       });
-      res.status(200).json({ message: 'Contrato excluído com sucesso.' });
+      res.status(200).json({ message: 'Contrato excluído com sucesso' });
   } catch (error) {
-      console.error("Erro ao excluir contrato", error);
-      res.status(500).json({ message: 'Erro ao excluir contrato.' });
+      console.error('Erro ao excluir contrato:', error);
+      res.status(500).json({ message: 'Erro ao excluir contrato' });
   }
 });
 

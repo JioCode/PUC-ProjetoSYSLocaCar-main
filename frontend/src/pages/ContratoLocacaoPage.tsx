@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../services/api.ts";
-import { Table, Button, Form, Row, Col, Alert } from "react-bootstrap";
+import { Table, Button, Form, Row, Col, Alert, Spinner } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 
 interface Contrato {
@@ -15,8 +15,8 @@ interface Contrato {
 const ContratoLocacaoPage: React.FC = () => {
     const [contratos, setContratos] = useState<Contrato[]>([]);
     const [novoContrato, setNovoContrato] = useState<Partial<Contrato>>({});
-    const [showModal, setShowModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
+    const [loading, setLoading] = useState(false); // Estado para o loader
 
     useEffect(() => {
         carregarContratos();
@@ -31,39 +31,65 @@ const ContratoLocacaoPage: React.FC = () => {
 
     // Salva um novo contrato no banco
     const salvarContrato = () => {
-        // Verificação de campos obrigatórios
-        if (!novoContrato.dataLocacao || !novoContrato.dataDevolucao || !novoContrato.valorCaucao || !novoContrato.valorTotal) {
-            setErrorMessage("Todos os campos devem ser preenchidos.");
+        // Validação de campos
+        if (
+            !novoContrato.dataLocacao ||
+            !novoContrato.dataDevolucao ||
+            !novoContrato.valorCaucao ||
+            novoContrato.valorCaucao <= 0 ||
+            !novoContrato.valorTotal ||
+            novoContrato.valorTotal <= 0
+        ) {
+            setErrorMessage("Preencha todos os campos corretamente. Valores devem ser positivos.");
             return;
         }
 
-        api.post("/contratos", novoContrato)
+        setLoading(true); // Ativa loader
+
+        // Ajusta datas no formato ISO
+        const contratoFormatado = {
+            ...novoContrato,
+            dataLocacao: new Date(novoContrato.dataLocacao!).toISOString(),
+            dataDevolucao: new Date(novoContrato.dataDevolucao!).toISOString(),
+        };
+
+        api.post("/contratos", contratoFormatado)
             .then(() => {
                 carregarContratos();
                 limparFormulario();
-                setErrorMessage(""); // Limpar mensagem de erro se o contrato for salvo com sucesso
+                setErrorMessage("");
             })
             .catch((error) => {
                 console.error("Erro ao salvar contrato", error);
                 setErrorMessage("Erro ao salvar contrato. Tente novamente.");
-            });
+            })
+            .finally(() => setLoading(false)); // Desativa loader
     };
 
     // Exclui um contrato pelo ID
     const excluirContrato = (id: number) => {
+        if (!window.confirm("Tem certeza que deseja excluir este contrato?")) return;
+
         api.delete(`/contratos/${id}`)
             .then(() => carregarContratos())
-            .catch((error) => console.error("Erro ao excluir contrato", error));
+            .catch((error) => {
+                console.error("Erro ao excluir contrato", error);
+                setErrorMessage("Erro ao excluir contrato. Tente novamente.");
+            });
     };
 
     // Limpa o formulário de contrato
     const limparFormulario = () => {
         setNovoContrato({});
-        setShowModal(false);
+    };
+
+    // Formatação de datas para exibição
+    const formatarData = (data: string) => {
+        return new Date(data).toLocaleDateString("pt-BR");
     };
 
     return (
-        <div className="container mt-4 p-4 bg-dark text-light rounded">
+        <div className="container mt-4 p-4 bg-dark text-light rounded" style={{ backgroundColor: "#212529" }}>
             <h2 className="mb-4 text-primary">Contrato de Locação</h2>
 
             {/* Exibe uma mensagem de erro se houver */}
@@ -117,12 +143,18 @@ const ContratoLocacaoPage: React.FC = () => {
                         />
                     </Col>
                     <Col md={4} className="d-flex align-items-end">
-                        <Button 
-                            variant="primary" 
-                            onClick={() => salvarContrato()} 
-                            disabled={!novoContrato.dataLocacao || !novoContrato.dataDevolucao || !novoContrato.valorCaucao || !novoContrato.valorTotal}
+                        <Button
+                            variant="primary"
+                            onClick={salvarContrato}
+                            disabled={
+                                loading ||
+                                !novoContrato.dataLocacao ||
+                                !novoContrato.dataDevolucao ||
+                                !novoContrato.valorCaucao ||
+                                !novoContrato.valorTotal
+                            }
                         >
-                            Salvar
+                            {loading ? <Spinner size="sm" animation="border" /> : "Salvar"}
                         </Button>
                     </Col>
                 </Row>
@@ -144,8 +176,8 @@ const ContratoLocacaoPage: React.FC = () => {
                     {contratos.map((contrato) => (
                         <tr key={contrato.id}>
                             <td>{contrato.id}</td>
-                            <td>{contrato.dataLocacao}</td>
-                            <td>{contrato.dataDevolucao}</td>
+                            <td>{formatarData(contrato.dataLocacao)}</td>
+                            <td>{formatarData(contrato.dataDevolucao)}</td>
                             <td>R$ {contrato.valorCaucao.toFixed(2)}</td>
                             <td>R$ {contrato.valorTotal.toFixed(2)}</td>
                             <td>
