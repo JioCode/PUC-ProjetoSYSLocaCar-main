@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { Navbar, Nav } from "react-bootstrap";
 import HomePage from './pages/HomePage.tsx';
 import ContratoLocacaoPage from './pages/ContratoLocacaoPage.tsx';
+import LocatarioPage from './pages/LocatarioPage.tsx';
 
 const App: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const App: React.FC = () => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ml-auto">
             <Nav.Link as={Link} to="/contratos">Contratos</Nav.Link>
+            <Nav.Link as={Link} to="/locatarios">Locatários</Nav.Link> {/* Adicionei o link */}
           </Nav>
         </Navbar.Collapse>
       </Navbar>
@@ -23,6 +25,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/contratos" element={<ContratoLocacaoPage />} />
+          <Route path="/locatarios" element={<LocatarioPage />} /> {/* Nova rota */}
         </Routes>
       </div>
     </Router>
