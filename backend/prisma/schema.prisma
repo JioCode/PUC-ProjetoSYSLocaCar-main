@@ -1,0 +1,97 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Cliente {
+  id            Int              @id @default(autoincrement())
+  nome          String
+  cpf           String           @unique
+  email         String           @unique
+  celular       String
+  contratos     ContratoLocacao[] @relation("ClienteContratos")  // Nome da relação
+}
+
+model Categoria {
+  id           Int      @id @default(autoincrement())
+  tipo         String
+  valorLocacao Float
+  modelos      Modelo[]
+}
+
+model Marca {
+  id      Int      @id @default(autoincrement())
+  nome    String
+  modelos Modelo[]
+}
+
+model Modelo {
+  id          Int        @id @default(autoincrement())
+  nome        String
+  anoModelo   DateTime
+  qtModelo    Int
+  categoria   Categoria  @relation(fields: [categoriaId], references: [id])
+  categoriaId Int
+  marca       Marca      @relation(fields: [marcaId], references: [id])
+  marcaId     Int
+  veiculos    Veiculo[]
+}
+
+model Veiculo {
+  id              Int               @id @default(autoincrement())
+  placa           String
+  chassi          String
+  anoFabricacao   DateTime
+  cor             String
+  status          String
+  modelo          Modelo            @relation(fields: [modeloId], references: [id])
+  modeloId        Int
+  manutencoes     Manutencao[]
+  contratos       ContratoLocacao[] @relation("ContratoVeiculos")
+}
+
+model Manutencao {
+  id             Int      @id @default(autoincrement())
+  descricao      String
+  dataManutencao DateTime
+  valorManutencao Float
+  veiculo        Veiculo  @relation(fields: [veiculoId], references: [id])
+  veiculoId      Int
+}
+
+model ContratoLocacao {
+  id            Int              @id @default(autoincrement())
+  dataLocacao   DateTime
+  dataDevolucao DateTime
+  valorCaucao   Float
+  valorTotal    Float
+  status        String
+  veiculos      Veiculo[]        @relation("ContratoVeiculos")
+  ocorrencias   Ocorrencia[]
+  pagamentos    Pagamento[]
+
+  cliente       Cliente?         @relation("ClienteContratos", fields: [clienteId], references: [id]) // Nome da relação
+  clienteId     Int?
+}
+
+model Ocorrencia {
+  id              Int             @id @default(autoincrement())
+  descricao       String
+  dataOcorrencia  DateTime
+  valorOcorrencia Float
+  contrato        ContratoLocacao @relation(fields: [contratoId], references: [id])
+  contratoId      Int
+}
+
+model Pagamento {
+  id             Int             @id @default(autoincrement())
+  data           DateTime
+  valorPago      Float
+  formaPagamento String
+  contrato       ContratoLocacao @relation(fields: [contratoId], references: [id])
+  contratoId     Int
+}
