@@ -95,3 +95,21 @@ model Pagamento {
   contrato       ContratoLocacao @relation(fields: [contratoId], references: [id])
   contratoId     Int
 }
+
+model Locatario {
+  id            Int     @id @default(autoincrement())
+  nomeLocatario String
+  cpfCnpj       String  @unique
+  nomeCondutor  String?
+  cnhCondutor   String?
+  telefone      String?
+  email         String?
+  cep           String?
+  rua           String?
+  numero        String?
+  logradouro    String?
+  estado        String?
+  cidade        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
