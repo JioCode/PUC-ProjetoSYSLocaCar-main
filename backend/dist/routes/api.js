@@ -49,4 +49,19 @@ router.get('/contratos', (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(500).json({ message: 'Erro ao buscar contratos' });
     }
 }));
+router.delete('/contratos/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    try {
+        const contratoExcluido = yield prisma.contratoLocacao.delete({
+            where: {
+                id: Number(id), // Certifique-se de que está convertendo o ID para número
+            },
+        });
+        res.status(200).json({ message: 'Contrato excluído com sucesso' });
+    }
+    catch (error) {
+        console.error('Erro ao excluir contrato:', error);
+        res.status(500).json({ message: 'Erro ao excluir contrato' });
+    }
+}));
 exports.default = router;

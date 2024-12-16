@@ -31,6 +31,8 @@ const ContratoLocacaoPage: React.FC = () => {
 
     // Salva um novo contrato no banco
     const salvarContrato = () => {
+        console.log("Dados enviados:", novoContrato); // Verifique os dados aqui
+        
         // Validação de campos
         if (
             !novoContrato.dataLocacao ||
@@ -51,7 +53,7 @@ const ContratoLocacaoPage: React.FC = () => {
             ...novoContrato,
             dataLocacao: new Date(novoContrato.dataLocacao!).toISOString(),
             dataDevolucao: new Date(novoContrato.dataDevolucao!).toISOString(),
-        };
+        };        
 
         api.post("/contratos", contratoFormatado)
             .then(() => {
@@ -60,23 +62,31 @@ const ContratoLocacaoPage: React.FC = () => {
                 setErrorMessage("");
             })
             .catch((error) => {
-                console.error("Erro ao salvar contrato", error);
-                setErrorMessage("Erro ao salvar contrato. Tente novamente.");
+                console.error('Erro ao salvar contrato:', error.response?.data); // Verifique o erro detalhado
+                setErrorMessage(error.response?.data?.message || "Erro ao salvar contrato.");
             })
             .finally(() => setLoading(false)); // Desativa loader
+        
     };
 
     // Exclui um contrato pelo ID
-    const excluirContrato = (id: number) => {
-        if (!window.confirm("Tem certeza que deseja excluir este contrato?")) return;
+const excluirContrato = (id: number) => {
+    console.log("Tentando excluir contrato com ID:", id); // Debug
 
-        api.delete(`/contratos/${id}`)
-            .then(() => carregarContratos())
-            .catch((error) => {
-                console.error("Erro ao excluir contrato", error);
-                setErrorMessage("Erro ao excluir contrato. Tente novamente.");
-            });
-    };
+    if (!window.confirm("Tem certeza que deseja excluir este contrato?")) return;
+
+    api.delete(`/contratos/${id}`)
+        .then((response) => {
+            console.log("Contrato excluído com sucesso:", response);
+            carregarContratos(); // Atualiza a lista após a exclusão
+        })
+        .catch((error) => {
+            console.error("Erro ao excluir contrato:", error);
+            setErrorMessage("Erro ao excluir contrato. Tente novamente.");
+        });
+};
+
+
 
     // Limpa o formulário de contrato
     const limparFormulario = () => {

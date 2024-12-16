@@ -3,10 +3,11 @@ import { PrismaClient } from '@prisma/client'; // Certifique-se de que o prisma 
 const prisma = new PrismaClient();
 const router = Router();
 
+
 // Rota POST para salvar contratos
 router.post('/contratos', async (req: Request, res: Response) => {
     const { dataLocacao, dataDevolucao, valorCaucao, valorTotal, status } = req.body;
-
+    
     try {
         // Criando o contrato no banco de dados
         const contrato = await prisma.contratoLocacao.create({

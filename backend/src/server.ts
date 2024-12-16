@@ -26,23 +26,20 @@ app.post('/api/contratos', async (req: Request, res: Response) => {
     try {
         const contrato = await prisma.contratoLocacao.create({
             data: {
-                dataLocacao,
-                dataDevolucao,
+                dataLocacao: new Date(dataLocacao),
+                dataDevolucao: new Date(dataDevolucao),
                 valorCaucao,
                 valorTotal,
                 status,
-                clienteId,
-                veiculos: {
-                    connect: veiculos.map((id: number) => ({ id }))
-                }
-            }
+            },
         });
-        res.status(201).json(contrato);
     } catch (error) {
-        console.error('Erro ao criar contrato:', error);
-        res.status(500).json({ error: 'Erro ao criar contrato' });
+        console.error("Erro ao salvar contrato:", error);
+        res.status(500).json({ message: 'Erro ao salvar contrato' });
     }
+
 });
+
 
 // Rota para editar um contrato existente
 app.put('/api/contratos/:id', async (req: Request, res: Response) => {
@@ -74,6 +71,7 @@ app.put('/api/contratos/:id', async (req: Request, res: Response) => {
 // Rota para excluir um contrato
 app.delete('/api/contratos/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
+    console.log(`Requisição para excluir contrato com ID: ${id}`);
 
     try {
         const contrato = await prisma.contratoLocacao.delete({
@@ -81,7 +79,7 @@ app.delete('/api/contratos/:id', async (req: Request, res: Response) => {
         });
         res.status(200).json({ message: 'Contrato excluído com sucesso', contrato });
     } catch (error) {
-        console.error(error);
+        console.error("Erro ao excluir contrato:", error);
         res.status(404).json({ error: 'Contrato não encontrado' });
     }
 });

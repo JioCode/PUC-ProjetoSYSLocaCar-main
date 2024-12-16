@@ -11,4 +11,6 @@ router.get("/contratos", async (req, res) => {
     res.json(contratos);
 });
 
+
+
 export default router;
